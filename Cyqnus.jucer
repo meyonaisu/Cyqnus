@@ -4,6 +4,11 @@
               addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
   <MAINGROUP id="NOolFC" name="Cyqnus">
     <GROUP id="{17EA876F-6211-FE2A-680F-0FBE31687764}" name="Source">
+      <FILE id="Nol9po" name="AHDSR.cpp" compile="1" resource="0" file="Source/AHDSR.cpp"/>
+      <FILE id="Iwyn3d" name="AHDSR.h" compile="0" resource="0" file="Source/AHDSR.h"/>
+      <FILE id="ZvvgR0" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
+      <FILE id="kcZWBm" name="SynthVoice.h" compile="0" resource="0" file="Source/SynthVoice.h"/>
+      <FILE id="URyHjx" name="SynthSound.h" compile="0" resource="0" file="Source/SynthSound.h"/>
       <FILE id="LMMSCJ" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="ORnJ5Z" name="PluginProcessor.h" compile="0" resource="0"
