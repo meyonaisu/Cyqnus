@@ -35,7 +35,7 @@ void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::Synthesiser
 
 void SynthVoice::stopNote(float, bool allowTailOff) {
 	if (allowTailOff) {
-		ampEnv.beginRelease();
+		ampEnv.noteOff();
 	} else {
 		ampEnv.reset();
 		clearCurrentNote();
