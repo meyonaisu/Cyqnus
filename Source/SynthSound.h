@@ -1,11 +1,8 @@
-/*
-  ==============================================================================
-
-    SynthSound.h
-    Created: 20 Aug 2025 11:24:21pm
-    Author:  Admin
-
-  ==============================================================================
-*/
-
 #pragma once
+#include <JuceHeader.h>
+
+struct SynthSound : public juce::SynthesiserSound
+{
+    bool appliesToNote(int) override { return true; }
+    bool appliesToChannel(int) override { return true; }
+};
