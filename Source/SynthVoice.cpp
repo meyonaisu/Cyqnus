@@ -66,8 +66,8 @@ void SynthVoice::renderNextBlock(juce::AudioBuffer<float>& output, int startSamp
 		const float env = ampEnv.getNextSample();
 		const float sample = osc * env * level;
 
-		left[i] = sample;
-		if (right) right[i] = sample;
+		left[i] += sample;
+		if (right) right[i] += sample;
 	} 
 
 	if (!ampEnv.isActive())
