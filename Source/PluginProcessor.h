@@ -9,6 +9,8 @@
 #pragma once
 
 #include <JuceHeader.h>
+#include "SynthVoice.h"
+#include "SynthSound.h"
 
 //==============================================================================
 /**
@@ -54,7 +56,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     juce::AudioProcessorValueTreeState apvts;
-    static juce::AudioProcessorValueTreeState::Parameter:Layout createParameterLayout();
+    static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
 
 private:
     juce::Synthesiser synth;

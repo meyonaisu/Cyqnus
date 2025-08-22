@@ -146,8 +146,13 @@ void CyqnusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce:
 	juce::ScopedNoDenormals noDenormals;
     buffer.clear();
 
-    synth.renderNextBlock(buffer, midiMessages);
+    synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 	
+	const float gain = apvts.getRawParameterValue("masterGain")->load();
+    masterGain.setGainLinear(gain);
+
+    juce::dsp::AudioBlock<float> block(buffer);
+    masterGain.process(juce::dsp::ProcessContextReplacing<float>(block));
 }
 
 //==============================================================================
@@ -187,7 +192,7 @@ juce::AudioProcessorValueTreeState::ParameterLayout CyqnusAudioProcessor::create
     using FloatParam = juce::AudioParameterFloat;
 	using Range = juce::NormalisableRange<float>;
 
-    std::vector<std::unique_ptr<RangedAudioParameter>> params;
+    std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
     auto secondsRange = Range(0.001f, 32.0f, 0.0f, 0.25f);
 	auto sustainRange = Range(0.0f, 1.0f);
     auto gainRange = Range(0.0f, 1.0f);
@@ -200,5 +205,5 @@ juce::AudioProcessorValueTreeState::ParameterLayout CyqnusAudioProcessor::create
 
     params.push_back(std::make_unique<FloatParam>("masterGain", "Master Gain", gainRange, 0.8f));
 	
-    return { params.begin(), params.end()) };
+    return { params.begin(), params.end() };
 }
