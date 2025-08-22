@@ -8,6 +8,7 @@ void AHDSR::reset() {
 	state = State::Idle;
 	level = 0.0f;
 	t = 0.0f;
+	releaseStartLevel = 0.0f;
 }
 
 void AHDSR::setParameters(const Params& p) {
@@ -24,6 +25,7 @@ void AHDSR::noteOn() {
 }
 
 void AHDSR::noteOff() {
+	releaseStartLevel = level;
 	state = State::Release;
 	t = 0.0f;
 }
