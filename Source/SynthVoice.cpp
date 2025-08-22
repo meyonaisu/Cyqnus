@@ -20,8 +20,8 @@ bool SynthVoice::canPlaySound(juce::SynthesiserSound* sound) {
 
 void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::SynthesiserSound* sound, int) {
 	currentFreq = static_cast<float>(juce::MidiMessage::getMidiNoteInHertz(midiNoteNumber));
-	phase = 0.0f;
 	level = juce::jlimit(0.0f, 1.0f, velocity);
+	phase = 0.0f;
 
 	AHDSR::Params envParams;
 	envParams.attack  = pAttack->load();

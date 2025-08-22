@@ -24,10 +24,10 @@ private:
 	std::atomic<float>* pSustain{ nullptr };
 	std::atomic<float>* pRelease{ nullptr };
 
+	AHDSR ampEnv;
+
 	double sampleRate = 44100.0;
 	float  currentFreq = 440.0f;
 	float  phase = 0.0f;
 	float  level = 1.0f;
-
-	AHDSR ampEnv;
 };
