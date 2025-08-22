@@ -19,9 +19,14 @@ CyqnusAudioProcessor::CyqnusAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+       apvts (*this, nullptr, "PARAMS", createParameterLayout())
 #endif
 {
+    for (int i = 0; i < kNumVoice; ++i) {
+		synth.addVoice(new SynthVoice(apvts));
+    }
+    synth.addSound(new SynthSound());
 }
 
 CyqnusAudioProcessor::~CyqnusAudioProcessor()
@@ -93,8 +98,15 @@ void CyqnusAudioProcessor::changeProgramName (int index, const juce::String& new
 //==============================================================================
 void CyqnusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
+    juce::ignoreUnused(samplesPerBlock);
+	synth.setCurrentPlaybackSampleRate(sampleRate);
+
+    procSpec.sampleRate = sampleRate;
+	procSpec.maximumBlockSize = samplesPerBlock;
+	procSpec.numChannels = static_cast<juce::uint32>(getTotalNumOutputChannels());
+
+    masterGain.prepare(procSpec);
+    masterGain.setRampDurationSeconds(0.05);
 }
 
 void CyqnusAudioProcessor::releaseResources()
@@ -131,31 +143,11 @@ bool CyqnusAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) c
 
 void CyqnusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-    juce::ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
+	juce::ScopedNoDenormals noDenormals;
+    buffer.clear();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        auto* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
+    synth.renderNextBlock(buffer, midiMessages);
+	
 }
 
 //==============================================================================
@@ -172,15 +164,15 @@ juce::AudioProcessorEditor* CyqnusAudioProcessor::createEditor()
 //==============================================================================
 void CyqnusAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    auto state = apvts.copyState();
+    if (auto xml = state.createXml())
+        copyXmlToBinary(*xml, destData);
 }
 
 void CyqnusAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    if (auto xml = getXmlFromBinary(data, sizeInBytes))
+        apvts.replaceState(juce::ValueTree::fromXml(*xml));
 }
 
 //==============================================================================
@@ -188,4 +180,25 @@ void CyqnusAudioProcessor::setStateInformation (const void* data, int sizeInByte
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new CyqnusAudioProcessor();
+}
+
+juce::AudioProcessorValueTreeState::ParameterLayout CyqnusAudioProcessor::createParameterLayout()
+{
+    using FloatParam = juce::AudioParameterFloat;
+	using Range = juce::NormalisableRange<float>;
+
+    std::vector<std::unique_ptr<RangedAudioParameter>> params;
+    auto secondsRange = Range(0.001f, 32.0f, 0.0f, 0.25f);
+	auto sustainRange = Range(0.0f, 1.0f);
+    auto gainRange = Range(0.0f, 1.0f);
+
+	params.push_back(std::make_unique<FloatParam>("ampAttack", "Attack", secondsRange, 0.01f));
+	params.push_back(std::make_unique<FloatParam>("ampHold", "Hold", secondsRange, 0.0f));
+	params.push_back(std::make_unique<FloatParam>("ampDecay", "Decay", secondsRange, 1.0f));
+	params.push_back(std::make_unique<FloatParam>("ampSustain", "Sustain", sustainRange, 0.5f));
+	params.push_back(std::make_unique<FloatParam>("ampRelease", "Release", secondsRange, 0.01f));
+
+    params.push_back(std::make_unique<FloatParam>("masterGain", "Master Gain", gainRange, 0.8f));
+	
+    return { params.begin(), params.end()) };
 }

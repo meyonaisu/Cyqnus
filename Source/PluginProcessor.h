@@ -53,7 +53,15 @@ public:
     void getStateInformation (juce::MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    juce::AudioProcessorValueTreeState apvts;
+    static juce::AudioProcessorValueTreeState::Parameter:Layout createParameterLayout();
+
 private:
-    //==============================================================================
+    juce::Synthesiser synth;
+    static constexpr int kNumVoice = 8;
+
+    juce::dsp::Gain<float> masterGain;
+    juce::dsp::ProcessSpec procSpec;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CyqnusAudioProcessor)
 };
