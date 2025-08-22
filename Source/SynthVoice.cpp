@@ -1,5 +1,5 @@
 #include "SynthVoice.h"
-
+ 
 SynthVoice::SynthVoice(juce::AudioProcessorValueTreeState& state)
 	: apvts(state) {
 	pAttack  = apvts.getRawParameterValue("ampAttack");

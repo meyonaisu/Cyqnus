@@ -3,7 +3,7 @@
 #include "AHDSR.h"
 #include "SynthSound.h"
 
-class SynthVoice : public juce::SynthesiserVoice {
+class SynthVoice : public juce::SynthesiserVoice { 
 public:
 	explicit SynthVoice(juce::AudioProcessorValueTreeState& state);
 
