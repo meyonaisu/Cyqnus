@@ -18,7 +18,6 @@ public:
 	void noteOff();
 	bool isActive();
 	float getNextSample();
-	void beginRelease();
 
 private:
 	enum class State {Idle, Attack, Hold, Decay, Sustain, Release};
