@@ -17,7 +17,7 @@
 class CyqnusAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
-    CyqnusAudioProcessorEditor (CyqnusAudioProcessor&);
+    explicit CyqnusAudioProcessorEditor (CyqnusAudioProcessor&);
     ~CyqnusAudioProcessorEditor() override;
 
     //==============================================================================
@@ -25,9 +25,10 @@ public:
     void resized() override;
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
     CyqnusAudioProcessor& audioProcessor;
+
+    juce::Slider attack, hold, decay, sustain, release, masterGain;
+    std::unique_ptr<juce::AudioProcessorValueTreeState::SliderAttachment> aAttack, aHold, aDecay, aSustain, aRelease, aGain;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CyqnusAudioProcessorEditor)
 };
