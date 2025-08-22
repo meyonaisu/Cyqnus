@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="JwRU1g" name="Cyqnus" projectType="audioplug" useAppConfig="0"
-              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1">
+              addUsingNamespaceToJuceHeader="0" jucerFormatVersion="1" pluginCharacteristicsValue="pluginIsSynth,pluginWantsMidiIn"
+              companyName="meyonaisu">
   <MAINGROUP id="NOolFC" name="Cyqnus">
     <GROUP id="{17EA876F-6211-FE2A-680F-0FBE31687764}" name="Source">
       <FILE id="Nol9po" name="AHDSR.cpp" compile="1" resource="0" file="Source/AHDSR.cpp"/>
