@@ -5,6 +5,8 @@
               companyName="meyonaisu">
   <MAINGROUP id="NOolFC" name="Cyqnus">
     <GROUP id="{17EA876F-6211-FE2A-680F-0FBE31687764}" name="Source">
+      <FILE id="UqnUVs" name="Oscillator.cpp" compile="1" resource="0" file="Source/Oscillator.cpp"/>
+      <FILE id="x3yc14" name="Oscillator.h" compile="0" resource="0" file="Source/Oscillator.h"/>
       <FILE id="Nol9po" name="AHDSR.cpp" compile="1" resource="0" file="Source/AHDSR.cpp"/>
       <FILE id="Iwyn3d" name="AHDSR.h" compile="0" resource="0" file="Source/AHDSR.h"/>
       <FILE id="ZvvgR0" name="SynthVoice.cpp" compile="1" resource="0" file="Source/SynthVoice.cpp"/>
