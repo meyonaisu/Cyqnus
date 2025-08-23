@@ -204,6 +204,35 @@ juce::AudioProcessorValueTreeState::ParameterLayout CyqnusAudioProcessor::create
 	params.push_back(std::make_unique<FloatParam>("ampRelease", "Release", secondsRange, 0.01f));
 
     params.push_back(std::make_unique<FloatParam>("masterGain", "Master Gain", gainRange, 0.8f));
+
+    auto oscWaveChoices = juce::StringArray{ "Sine", "Saw", "Square", "Triangle", "Pulse", "Noise" };
+    auto oscLevelRange = Range{ 0.0f, 1.0f };
+    auto oscCoarseRange = Range{ -24.0f, 24.0f, 1.0f };
+    auto oscFineRange = Range{ -100.0f, 100.0f };
+    auto oscPWRange = Range{ 0.01f, 0.99f };
+    auto oscDetuneRange = Range{ 0.0f, 10.0f };
+
+    // o1
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("osc1Wave", "Osc 1 Waveform", oscWaveChoices, 0));
+    params.push_back(std::make_unique<FloatParam>("osc1Level", "Osc 1 Level", oscLevelRange, 0.8f));
+    params.push_back(std::make_unique<FloatParam>("osc1Coarse", "Osc 1 Coarse", oscCoarseRange, 0.0f));
+    params.push_back(std::make_unique<FloatParam>("osc1Fine", "Osc 1 Fine", oscFineRange, 0.0f));
+    params.push_back(std::make_unique<FloatParam>("osc1PW", "Osc 1 PulseWidth", oscPWRange, 0.5f));
+    params.push_back(std::make_unique<FloatParam>("osc1Detune", "Osc 1 Detune", oscDetuneRange, 0.0f));
+    // o2
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("osc2Wave", "Osc 2 Waveform", oscWaveChoices, 0));
+    params.push_back(std::make_unique<FloatParam>("osc2Level", "Osc 2 Level", oscLevelRange, 0.8f));
+    params.push_back(std::make_unique<FloatParam>("osc2Coarse", "Osc 2 Coarse", oscCoarseRange, 12.0f));
+    params.push_back(std::make_unique<FloatParam>("osc2Fine", "Osc 2 Fine", oscFineRange, 0.0f));
+    params.push_back(std::make_unique<FloatParam>("osc2PW", "Osc 2 PulseWidth", oscPWRange, 0.5f));
+    params.push_back(std::make_unique<FloatParam>("osc2Detune", "Osc 2 Detune", oscDetuneRange, 0.0f));
+    // o3
+    params.push_back(std::make_unique<juce::AudioParameterChoice>("osc3Wave", "Osc 3 Waveform", oscWaveChoices, 0));
+    params.push_back(std::make_unique<FloatParam>("osc3Level", "Osc 3 Level", oscLevelRange, 0.8f));
+    params.push_back(std::make_unique<FloatParam>("osc3Coarse", "Osc 3 Coarse", oscCoarseRange, 24.0f));
+    params.push_back(std::make_unique<FloatParam>("osc3Fine", "Osc 3 Fine", oscFineRange, 0.0f));
+    params.push_back(std::make_unique<FloatParam>("osc3PW", "Osc 3 PulseWidth", oscPWRange, 0.5f));
+    params.push_back(std::make_unique<FloatParam>("osc3Detune", "Osc 3 Detune", oscDetuneRange, 0.0f));
 	
     return { params.begin(), params.end() };
 }
