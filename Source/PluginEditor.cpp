@@ -38,6 +38,22 @@ CyqnusAudioProcessorEditor::CyqnusAudioProcessorEditor (CyqnusAudioProcessor& p)
     aSustain = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, "ampSustain", sustain);
     aRelease = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, "ampRelease", release);
 	aGain    = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, "masterGain", masterGain);
+
+    osc1Wave.addItemList(juce::StringArray{ "Sine", "Saw", "Square", "Triangle", "Pulse", "Noise" }, 1);
+    addAndMakeVisible(osc1Wave);
+    configKnob(osc1Level);  addAndMakeVisible(osc1Level);
+    configKnob(osc1Coarse); addAndMakeVisible(osc1Coarse);
+    configKnob(osc1Fine);   addAndMakeVisible(osc1Fine);
+    configKnob(osc1PW);     addAndMakeVisible(osc1PW);
+    configKnob(osc1Detune); addAndMakeVisible(osc1Detune);
+
+    aOsc1Wave = std::make_unique<juce::AudioProcessorValueTreeState::ComboBoxAttachment>(apvts, "osc1Wave", osc1Wave);
+    aOsc1Level = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, "osc1Level", osc1Level);
+    aOsc1Coarse = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, "osc1Coarse", osc1Coarse);
+    aOsc1Fine = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, "osc1Fine", osc1Fine);
+    aOsc1PW = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, "osc1PW", osc1PW);
+    aOsc1Detune = std::make_unique<juce::AudioProcessorValueTreeState::SliderAttachment>(apvts, "osc1Detune", osc1Detune);
+
 }
 
 CyqnusAudioProcessorEditor::~CyqnusAudioProcessorEditor()
@@ -65,6 +81,15 @@ void CyqnusAudioProcessorEditor::paint (juce::Graphics& g)
     label(g, { 340, 70, 100, 20 }, "Sustain");
     label(g, { 450, 70, 100, 20 }, "Release");
     label(g, { 10, 190, 520, 20 }, "Master Gain");
+
+    g.setFont(13.0f);
+    g.setColour(juce::Colours::grey);
+    g.drawFittedText("Osc 1 Wave", { 10, 210, 100, 20 }, juce::Justification::centredTop, 1);
+    g.drawFittedText("Level", { 120, 210, 100, 20 }, juce::Justification::centredTop, 1);
+    g.drawFittedText("Coarse", { 230, 210, 100, 20 }, juce::Justification::centredTop, 1);
+    g.drawFittedText("Fine", { 340, 210, 100, 20 }, juce::Justification::centredTop, 1);
+    g.drawFittedText("PulseW", { 450, 210, 100, 20 }, juce::Justification::centredTop, 1);
+    g.drawFittedText("Detune", { 560, 210, 100, 20 }, juce::Justification::centredTop, 1);
 }
 
 void CyqnusAudioProcessorEditor::resized()
@@ -76,12 +101,21 @@ void CyqnusAudioProcessorEditor::resized()
     auto knobRow = area.removeFromTop(120);
     auto w = 100, h = 90, y = knobRow.getY() + 20;
 
-	attack.setBounds(10, y, w, h);
+    attack.setBounds(10, y, w, h);
     hold.setBounds(120, y, w, h);
     decay.setBounds(230, y, w, h);
     sustain.setBounds(340, y, w, h);
     release.setBounds(450, y, w, h);
 
     area.removeFromTop(10);
-	masterGain.setBounds(area.removeFromTop(40));
+    masterGain.setBounds(area.removeFromTop(40));
+
+    // Now place Osc1 row
+    int rowY = 180; // or compute from area
+    osc1Wave.setBounds(10, rowY, 100, 24);
+    osc1Level.setBounds(120, rowY, w, h);
+    osc1Coarse.setBounds(230, rowY, w, h);
+    osc1Fine.setBounds(340, rowY, w, h);
+    osc1PW.setBounds(450, rowY, w, h);
+    osc1Detune.setBounds(560, rowY, w, h);
 }
