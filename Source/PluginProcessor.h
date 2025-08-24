@@ -57,7 +57,6 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
-    juce::MidiKeyboardState keyboardState;
 
 private:
     juce::Synthesiser synth;
@@ -65,7 +64,6 @@ private:
 
     juce::dsp::Gain<float> masterGain;
     juce::dsp::ProcessSpec procSpec;
-
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CyqnusAudioProcessor)
 };

@@ -68,7 +68,7 @@ void SynthVoice::startNote(int midiNoteNumber, float velocity, juce::Synthesiser
 			osc.setWaveform(static_cast<Oscillator::Waveform>(static_cast<int>(wave->load())));
 			osc.setLevel(level->load());
 			osc.setCoarse(static_cast<int>(coarse->load()));
-			osc.setFinetune(fine->load());
+			osc.setFinetine(fine->load());
 			osc.setPulseWidth(pw->load());
 			osc.setDetuneSpread(detune->load());
 			osc.setFrequency(currentFreq);
