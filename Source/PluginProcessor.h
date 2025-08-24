@@ -57,6 +57,7 @@ public:
 
     juce::AudioProcessorValueTreeState apvts;
     static juce::AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
+    juce::MidiKeyboardState keyboardState;
 
 private:
     juce::Synthesiser synth;

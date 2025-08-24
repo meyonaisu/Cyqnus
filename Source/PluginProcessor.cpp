@@ -150,6 +150,11 @@ void CyqnusAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::
     juce::ScopedNoDenormals noDenormals;
     buffer.clear();
 
+    juce::MidiBuffer keyboardMidiMessages;
+    keyboardState.processNextMidiBuffer(keyboardMidiMessages, 0, buffer.getNumSamples(), true);
+
+    midiMessages.addEvents(keyboardMidiMessages, 0, buffer.getNumSamples(), 0);
+
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
 
     const float gain = apvts.getRawParameterValue("masterGain")->load();
