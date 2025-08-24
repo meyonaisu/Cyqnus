@@ -12,19 +12,19 @@
 //==============================================================================
 CyqnusAudioProcessor::CyqnusAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  juce::AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
-                     #endif
-                       ),
-       apvts (*this, nullptr, "PARAMS", createParameterLayout())
+    : AudioProcessor(BusesProperties()
+#if ! JucePlugin_IsMidiEffect
+#if ! JucePlugin_IsSynth
+        .withInput("Input", juce::AudioChannelSet::stereo(), true)
+#endif
+        .withOutput("Output", juce::AudioChannelSet::stereo(), true)
+#endif
+    ),
+    apvts(*this, nullptr, "PARAMS", createParameterLayout())
 #endif
 {
     for (int i = 0; i < kNumVoice; ++i) {
-		synth.addVoice(new SynthVoice(apvts));
+        synth.addVoice(new SynthVoice(apvts));
     }
     synth.addSound(new SynthSound());
 }
@@ -41,29 +41,29 @@ const juce::String CyqnusAudioProcessor::getName() const
 
 bool CyqnusAudioProcessor::acceptsMidi() const
 {
-   #if JucePlugin_WantsMidiInput
+#if JucePlugin_WantsMidiInput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool CyqnusAudioProcessor::producesMidi() const
 {
-   #if JucePlugin_ProducesMidiOutput
+#if JucePlugin_ProducesMidiOutput
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 bool CyqnusAudioProcessor::isMidiEffect() const
 {
-   #if JucePlugin_IsMidiEffect
+#if JucePlugin_IsMidiEffect
     return true;
-   #else
+#else
     return false;
-   #endif
+#endif
 }
 
 double CyqnusAudioProcessor::getTailLengthSeconds() const
@@ -74,7 +74,7 @@ double CyqnusAudioProcessor::getTailLengthSeconds() const
 int CyqnusAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
+    // so this should be at least 1, even if you're not really implementing programs.
 }
 
 int CyqnusAudioProcessor::getCurrentProgram()
@@ -82,28 +82,32 @@ int CyqnusAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void CyqnusAudioProcessor::setCurrentProgram (int index)
+void CyqnusAudioProcessor::setCurrentProgram(int index)
 {
 }
 
-const juce::String CyqnusAudioProcessor::getProgramName (int index)
+const juce::String CyqnusAudioProcessor::getProgramName(int index)
 {
     return {};
 }
 
-void CyqnusAudioProcessor::changeProgramName (int index, const juce::String& newName)
+void CyqnusAudioProcessor::changeProgramName(int index, const juce::String& newName)
 {
 }
 
 //==============================================================================
-void CyqnusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void CyqnusAudioProcessor::prepareToPlay(double sampleRate, int samplesPerBlock)
 {
     juce::ignoreUnused(samplesPerBlock);
-	synth.setCurrentPlaybackSampleRate(sampleRate);
+    synth.setCurrentPlaybackSampleRate(sampleRate);
+
+    for (int i = 0; i < synth.getNumVoices(); ++i)
+        if (auto* voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
+            voice->prepareToPlay(sampleRate, samplesPerBlock);
 
     procSpec.sampleRate = sampleRate;
-	procSpec.maximumBlockSize = samplesPerBlock;
-	procSpec.numChannels = static_cast<juce::uint32>(getTotalNumOutputChannels());
+    procSpec.maximumBlockSize = samplesPerBlock;
+    procSpec.numChannels = static_cast<juce::uint32>(getTotalNumOutputChannels());
 
     masterGain.prepare(procSpec);
     masterGain.setRampDurationSeconds(0.05);
@@ -116,39 +120,39 @@ void CyqnusAudioProcessor::releaseResources()
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations
-bool CyqnusAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
+bool CyqnusAudioProcessor::isBusesLayoutSupported(const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    juce::ignoreUnused (layouts);
+#if JucePlugin_IsMidiEffect
+    juce::ignoreUnused(layouts);
     return true;
-  #else
+#else
     // This is the place where you check if the layout is supported.
     // In this template code we only support mono or stereo.
     // Some plugin hosts, such as certain GarageBand versions, will only
     // load plugins that support stereo bus layouts.
     if (layouts.getMainOutputChannelSet() != juce::AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
+        && layouts.getMainOutputChannelSet() != juce::AudioChannelSet::stereo())
         return false;
 
     // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
+#if ! JucePlugin_IsSynth
     if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
         return false;
-   #endif
+#endif
 
     return true;
-  #endif
+#endif
 }
 #endif
 
-void CyqnusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void CyqnusAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-	juce::ScopedNoDenormals noDenormals;
+    juce::ScopedNoDenormals noDenormals;
     buffer.clear();
 
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-	
-	const float gain = apvts.getRawParameterValue("masterGain")->load();
+
+    const float gain = apvts.getRawParameterValue("masterGain")->load();
     masterGain.setGainLinear(gain);
 
     juce::dsp::AudioBlock<float> block(buffer);
@@ -163,18 +167,18 @@ bool CyqnusAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* CyqnusAudioProcessor::createEditor()
 {
-    return new CyqnusAudioProcessorEditor (*this);
+    return new CyqnusAudioProcessorEditor(*this);
 }
 
 //==============================================================================
-void CyqnusAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
+void CyqnusAudioProcessor::getStateInformation(juce::MemoryBlock& destData)
 {
     auto state = apvts.copyState();
     if (auto xml = state.createXml())
         copyXmlToBinary(*xml, destData);
 }
 
-void CyqnusAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+void CyqnusAudioProcessor::setStateInformation(const void* data, int sizeInBytes)
 {
     if (auto xml = getXmlFromBinary(data, sizeInBytes))
         apvts.replaceState(juce::ValueTree::fromXml(*xml));
@@ -190,18 +194,18 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 juce::AudioProcessorValueTreeState::ParameterLayout CyqnusAudioProcessor::createParameterLayout()
 {
     using FloatParam = juce::AudioParameterFloat;
-	using Range = juce::NormalisableRange<float>;
+    using Range = juce::NormalisableRange<float>;
 
     std::vector<std::unique_ptr<juce::RangedAudioParameter>> params;
     auto secondsRange = Range(0.001f, 32.0f, 0.0f, 0.25f);
-	auto sustainRange = Range(0.0f, 1.0f);
+    auto sustainRange = Range(0.0f, 1.0f);
     auto gainRange = Range(0.0f, 1.0f);
 
-	params.push_back(std::make_unique<FloatParam>("ampAttack", "Attack", secondsRange, 0.01f));
-	params.push_back(std::make_unique<FloatParam>("ampHold", "Hold", secondsRange, 0.0f));
-	params.push_back(std::make_unique<FloatParam>("ampDecay", "Decay", secondsRange, 1.0f));
-	params.push_back(std::make_unique<FloatParam>("ampSustain", "Sustain", sustainRange, 0.5f));
-	params.push_back(std::make_unique<FloatParam>("ampRelease", "Release", secondsRange, 0.01f));
+    params.push_back(std::make_unique<FloatParam>("ampAttack", "Attack", secondsRange, 0.01f));
+    params.push_back(std::make_unique<FloatParam>("ampHold", "Hold", secondsRange, 0.0f));
+    params.push_back(std::make_unique<FloatParam>("ampDecay", "Decay", secondsRange, 1.0f));
+    params.push_back(std::make_unique<FloatParam>("ampSustain", "Sustain", sustainRange, 0.5f));
+    params.push_back(std::make_unique<FloatParam>("ampRelease", "Release", secondsRange, 0.01f));
 
     params.push_back(std::make_unique<FloatParam>("masterGain", "Master Gain", gainRange, 0.8f));
 
@@ -233,6 +237,6 @@ juce::AudioProcessorValueTreeState::ParameterLayout CyqnusAudioProcessor::create
     params.push_back(std::make_unique<FloatParam>("osc3Fine", "Osc 3 Fine", oscFineRange, 0.0f));
     params.push_back(std::make_unique<FloatParam>("osc3PW", "Osc 3 PulseWidth", oscPWRange, 0.5f));
     params.push_back(std::make_unique<FloatParam>("osc3Detune", "Osc 3 Detune", oscDetuneRange, 0.0f));
-	
+
     return { params.begin(), params.end() };
 }
