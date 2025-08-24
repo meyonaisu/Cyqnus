@@ -12,7 +12,7 @@ public:
 	void setWaveform(Waveform wf);
 	void setLevel(float lvl);
 	void setCoarse(int semis);
-	void setFinetine(float cents);
+	void setFinetune(float cents);
 	void setPhaseOffset(float rads);
 	void setPulseWidth(float pw);
 	void setDetuneSpread(float speedHz);

@@ -25,7 +25,7 @@ void Oscillator::setCoarse(int semis) {
 	updatePhaseIncrement();
 }
 
-void Oscillator::setFinetine(float cents) {
+void Oscillator::setFinetune(float cents) {
 	fine = juce::jlimit(-100.0f, 100.0f, cents);
 	updatePhaseIncrement();
 }
@@ -82,7 +82,13 @@ void Oscillator::updatePhaseIncrement() {
 	float centsRatio = std::pow(2.0f, fine / 1200.0f);
 
 	float adjustedFrequency = (frequency * semitoneRatio * centsRatio) + detuneSpread;
-	phaseInc = (twoPi * adjustedFrequency) / sampleRate;
+	phaseInc = (twoPi * adjustedFrequency) / static_cast<float>(sampleRate);
+
+	DBG("Base Freq: " << frequency <<
+		", Coarse: " << coarse << " (" << semitoneRatio << "x)" <<
+		", Fine: " << fine << " (" << centsRatio << "x)" <<
+		", Detune: " << detuneSpread <<
+		", Final Freq: " << adjustedFrequency);
 }
 
 void Oscillator::wrapPhase() {
