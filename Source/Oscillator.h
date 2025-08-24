@@ -3,20 +3,17 @@
 
 class Oscillator {
 public:
-	enum Waveform {Sine, Saw, Square, Triangle, Pulse, Noise};
-
+	enum Waveform { Sine, Saw, Square, Triangle, Pulse, Noise };
 	Oscillator();
-
 	void setSampleRate(double sr);
 	void setFrequency(float freq);
 	void setWaveform(Waveform wf);
 	void setLevel(float lvl);
 	void setCoarse(int semis);
 	void setFinetune(float cents);
-	void setPhaseOffset(float rads);
+	void setPhaseOffset(float offset);
 	void setPulseWidth(float pw);
 	void setDetuneSpread(float speedHz);
-
 	float getNextSample();
 
 private:
@@ -34,7 +31,5 @@ private:
 	float  detuneSpread{ 0.0f };
 
 	Waveform waveform = Sine;
-
-	const float twoPi = static_cast<float>(juce::MathConstants<double>::twoPi);
 	juce::Random random;
 };

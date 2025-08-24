@@ -30,8 +30,8 @@ void Oscillator::setFinetune(float cents) {
 	updatePhaseIncrement();
 }
 
-void Oscillator::setPhaseOffset(float rads) {
-	phase = rads;
+void Oscillator::setPhaseOffset(float offset) {
+	phase = offset;
 	wrapPhase();
 }
 
@@ -45,30 +45,31 @@ void Oscillator::setDetuneSpread(float speedHz) {
 
 float Oscillator::getNextSample() {
 	float sample = 0.0f;
+	const float twoPi = static_cast<float>(juce::MathConstants<double>::twoPi);
 
 	switch (waveform) {
-		case Sine:
-			sample = std::sin(phase);
-			break;
-		case Saw:
-			sample = 1.0f - (2.0f * phase / twoPi);
-			break;
-		case Square:
-			sample = (phase < juce::MathConstants<float>::pi) ? 1.0f : -1.0f;
-			break;
-		case Triangle:
-			if (phase < juce::MathConstants<float>::pi)
-				sample = -1.0f + (2.0f * phase / juce::MathConstants<float>::pi);
-			else
-				sample = 3.0f - (2.0f * phase / juce::MathConstants<float>::pi);
-			break;
-		case Pulse:
-			sample = (phase < (twoPi * pulseWidth)) ? 1.0f : -1.0f;
-			break;
-		case Noise:
-			sample = random.nextFloat() * 2.0f - 1.0f;
-			break;
-		default: jassertfalse; break;
+	case Sine:
+		sample = std::sin(phase * twoPi);
+		break;
+	case Saw:
+		sample = 1.0f - 2.0f * phase;
+		break;
+	case Square:
+		sample = (phase < 0.5f) ? 1.0f : -1.0f;
+		break;
+	case Triangle:
+		if (phase < 0.5f)
+			sample = -1.0f + 4.0f * phase;
+		else
+			sample = 3.0f - 4.0f * phase;
+		break;
+	case Pulse:
+		sample = (phase < pulseWidth) ? 1.0f : -1.0f;
+		break;
+	case Noise:
+		sample = random.nextFloat() * 2.0f - 1.0f;
+		break;
+	default: jassertfalse; break;
 	}
 
 	phase += phaseInc;
@@ -80,20 +81,16 @@ float Oscillator::getNextSample() {
 void Oscillator::updatePhaseIncrement() {
 	float semitoneRatio = std::pow(2.0f, coarse / 12.0f);
 	float centsRatio = std::pow(2.0f, fine / 1200.0f);
-
 	float adjustedFrequency = (frequency * semitoneRatio * centsRatio) + detuneSpread;
-	phaseInc = (twoPi * adjustedFrequency) / static_cast<float>(sampleRate);
 
-	DBG("Base Freq: " << frequency <<
-		", Coarse: " << coarse << " (" << semitoneRatio << "x)" <<
-		", Fine: " << fine << " (" << centsRatio << "x)" <<
-		", Detune: " << detuneSpread <<
-		", Final Freq: " << adjustedFrequency);
+	phaseInc = adjustedFrequency / static_cast<float>(sampleRate);
+
+	DBG("Sample rate: " << sampleRate << " Freq: " << adjustedFrequency << " Hz, PhaseInc : " << phaseInc);
 }
 
 void Oscillator::wrapPhase() {
-	if (phase >= twoPi)
-		phase -= twoPi;
-	else if (phase < 0.0f)
-		phase += twoPi;
+	while (phase >= 1.0f)
+		phase -= 1.0f;
+	while (phase < 0.0f)
+		phase += 1.0f;
 }
