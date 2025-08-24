@@ -101,6 +101,10 @@ void CyqnusAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock
     juce::ignoreUnused(samplesPerBlock);
 	synth.setCurrentPlaybackSampleRate(sampleRate);
 
+    for (int i = 0; i < synth.getNumVoices(); ++i)
+        if (auto* voice = dynamic_cast<SynthVoice*>(synth.getVoice(i)))
+            voice->prepareToPlay(sampleRate, samplesPerBlock);
+
     procSpec.sampleRate = sampleRate;
 	procSpec.maximumBlockSize = samplesPerBlock;
 	procSpec.numChannels = static_cast<juce::uint32>(getTotalNumOutputChannels());
@@ -141,14 +145,19 @@ bool CyqnusAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) c
 }
 #endif
 
-void CyqnusAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
+void CyqnusAudioProcessor::processBlock(juce::AudioBuffer<float>& buffer, juce::MidiBuffer& midiMessages)
 {
-	juce::ScopedNoDenormals noDenormals;
+    juce::ScopedNoDenormals noDenormals;
     buffer.clear();
 
+    juce::MidiBuffer keyboardMidiMessages;
+    keyboardState.processNextMidiBuffer(keyboardMidiMessages, 0, buffer.getNumSamples(), true);
+
+    midiMessages.addEvents(keyboardMidiMessages, 0, buffer.getNumSamples(), 0);
+
     synth.renderNextBlock(buffer, midiMessages, 0, buffer.getNumSamples());
-	
-	const float gain = apvts.getRawParameterValue("masterGain")->load();
+
+    const float gain = apvts.getRawParameterValue("masterGain")->load();
     masterGain.setGainLinear(gain);
 
     juce::dsp::AudioBlock<float> block(buffer);
