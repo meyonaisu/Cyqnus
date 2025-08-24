@@ -84,8 +84,6 @@ void Oscillator::updatePhaseIncrement() {
 	float adjustedFrequency = (frequency * semitoneRatio * centsRatio) + detuneSpread;
 
 	phaseInc = adjustedFrequency / static_cast<float>(sampleRate);
-
-	DBG("Sample rate: " << sampleRate << " Freq: " << adjustedFrequency << " Hz, PhaseInc : " << phaseInc);
 }
 
 void Oscillator::wrapPhase() {
